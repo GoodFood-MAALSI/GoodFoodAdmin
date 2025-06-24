@@ -1,0 +1,12 @@
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: goodfood_administrateur_db_container
+    ports:
+      - '5436:5436'
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 86oQya`HI+WY455DrR
+      POSTGRES_DB: goodfood_administrateur
+      PGPORT: 5436
