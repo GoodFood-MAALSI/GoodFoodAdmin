@@ -9,6 +9,7 @@ import {
   HttpException,
   HttpStatus,
   Request,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -23,15 +24,35 @@ import { User as UserDecorator } from './decorators/user.decorator';
 import { User } from './entities/user.entity';
 import * as jwt from 'jsonwebtoken';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateAdminUserDto } from './dto/create-admin-user.dto';
+import { AuthValidGuard } from '../auth/guards/auth-valid.guard';
+import { SuperAdminGuard } from './guards/super-admin.guard';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Post()
+  @ApiBearerAuth()
+  @UseGuards(SuperAdminGuard)
+  @ApiOperation({
+    summary:
+      'Créer un nouvel utilisateur et envoyer un email avec le mot de passe',
+  })
+  @ApiResponse({ status: 201, description: 'Utilisateur créé avec succès' })
+  @ApiResponse({ status: 409, description: 'Utilisateur déjà existant' })
+  async create(
+    @Body() createUserDto: CreateAdminUserDto,
+  ): Promise<{ message: string }> {
+    const message =
+      await this.usersService.createUserWithPasswordEmail(createUserDto);
+    return { message };
+  }
+
   @Get(':id')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthValidGuard)
   @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
   @ApiResponse({ status: 200, description: 'Utilisateur trouvé' })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
@@ -66,7 +87,7 @@ export class UsersController {
 
   @Patch(':id')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthValidGuard)
   @ApiOperation({
     summary: "Mettre à jour le prénom et/ou nom d'un utilisateur",
   })
@@ -113,7 +134,7 @@ export class UsersController {
 
   @Delete(':id')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthValidGuard)
   @ApiOperation({ summary: 'Supprimer définitivement un utilisateur' })
   @ApiResponse({
     status: 200,
@@ -152,22 +173,21 @@ export class UsersController {
 
   @Get('/verify/:userId')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Vérifier un utilisateur pour les appels inter-services' })
+  @UseGuards(AuthValidGuard)
+  @ApiOperation({
+    summary: 'Vérifier un utilisateur pour les appels inter-services',
+  })
   @ApiResponse({ status: 200, description: 'Utilisateur vérifié' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 403, description: 'Rôle invalide' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async verifyRestaurateur(@Param('userId') userId: string, @Request() req) {
-
-    // Récupérer le token depuis l'en-tête Authorization
+  async verifyAdministrateur(@Param('userId') userId: string, @Request() req) {
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
       throw new HttpException('Token manquant', HttpStatus.UNAUTHORIZED);
     }
 
     try {
-      // Valider le token avec la clé secrète
       let decoded: any = null;
       const secret = process.env.AUTH_JWT_SECRET;
       decoded = jwt.verify(token, secret);
@@ -175,15 +195,21 @@ export class UsersController {
       const authRole = decoded.role;
 
       if (!authUserId || !authRole) {
-        throw new HttpException('ID ou rôle manquant dans le token', HttpStatus.UNAUTHORIZED);
+        throw new HttpException(
+          'ID ou rôle manquant dans le token',
+          HttpStatus.UNAUTHORIZED,
+        );
       }
 
-      if (authRole !== 'restaurateur') {
+      if (authRole !== 'administrateur') {
         throw new HttpException('Rôle invalide', HttpStatus.FORBIDDEN);
       }
 
       if (userId !== authUserId) {
-        throw new HttpException('Utilisateur non autorisé', HttpStatus.FORBIDDEN);
+        throw new HttpException(
+          'Utilisateur non autorisé',
+          HttpStatus.FORBIDDEN,
+        );
       }
 
       const user = await this.usersService.findOneUser({ id: +userId });
@@ -191,9 +217,12 @@ export class UsersController {
         throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
       }
 
-      return { message: 'Restaurateur vérifié' };
+      return { message: 'Administrateur vérifié' };
     } catch (err) {
-      throw new HttpException('Erreur de validation du token', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        'Erreur de validation du token',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
   }
 }

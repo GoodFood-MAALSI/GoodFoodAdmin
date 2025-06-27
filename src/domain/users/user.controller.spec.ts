@@ -6,6 +6,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ExecutionContext } from '@nestjs/common';
 import { JwtPayloadType } from '../auth/strategies/types/jwt-payload.type';
+import { UserRole } from './entities/user.entity';
 
 // Mock du service
 const mockUsersService = {
@@ -43,6 +44,7 @@ function createMockJwtPayload(id: number): JwtPayloadType {
     sessionId: 123,
     iat: Math.floor(Date.now() / 1000) - 1000,
     exp: Math.floor(Date.now() / 1000) + 3600,
+    role:UserRole.Admin, 
   };
 }
 

@@ -8,7 +8,6 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
-  OneToMany,
 } from "typeorm";
 import { EntityHelper } from "src/domain/utils/entity-helper";
 import { Exclude } from "class-transformer";
@@ -20,11 +19,16 @@ export enum UserStatus {
   Inactive = "inactive",
 }
 
+export enum UserRole {
+  SuperAdmin = "super-admin",
+  Admin = "admin",
+}
+
 @Entity()
 export class User extends EntityHelper {
   @PrimaryGeneratedColumn()
   id: number;
-  
+
   @ApiProperty({ example: 'email@gmail.com' })
   @Column({ type: String, unique: true, nullable: true })
   email: string | null;
@@ -76,4 +80,12 @@ export class User extends EntityHelper {
   @ApiProperty()
   @UpdateDateColumn()
   updated_at: Date;
+
+  @ApiProperty({ example: false })
+  @Column({ type: "boolean", default: false })
+  force_password_change: boolean;
+
+  @ApiProperty({ example: UserRole.Admin })
+  @Column({ type: "enum", enum: UserRole, default: UserRole.Admin })
+  role: UserRole;
 }

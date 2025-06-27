@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus, I
 import * as jwt from 'jsonwebtoken';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { UsersService } from '../users/users.service';
+import { UsersService } from 'src/domain/users/users.service';
 
 @Injectable()
 export class RolesAuthGuard implements CanActivate {

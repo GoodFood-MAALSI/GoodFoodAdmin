@@ -5,4 +5,5 @@ export type LoginResponseType = Readonly<{
   refreshToken: string;
   tokenExpires: number;
   user: User;
+  force_password_change: boolean;
 }>;

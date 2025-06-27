@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, Matches, MinLength } from 'class-validator';
 import { lowerCaseTransformer } from 'src/domain/utils/transformers/lower-case.transformer';
-import { UserStatus } from '../entities/user.entity';
+import { UserRole, UserStatus } from '../entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
@@ -29,4 +29,6 @@ export class CreateUserDto {
   status?: UserStatus;
 
   hash?: string | null;
+
+  role?: UserRole;
 }
