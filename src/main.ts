@@ -7,6 +7,9 @@ import { AllExceptionsFilter } from './domain/utils/filters/http-exception.filte
 import { ResponseInterceptor } from './domain/utils/interceptors/response.interceptor';
 import { useContainer } from 'class-validator';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { UserSeeder } from './database/seeders/user.seeder';
+import { DataSource } from 'typeorm';
+import { runSeeders } from 'typeorm-extension';
 
 dotenv.config();
 
@@ -49,6 +52,23 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
+
+  // Exécuter les seeders en environnement de développement si nécessaire
+  if (process.env.NODE_ENV === 'development' && process.env.RUN_SEEDERS === 'true') {
+    console.log('Running database seeders...');
+    const dataSource = app.get(DataSource);
+    try {
+      await runSeeders(dataSource, {
+        seeds: [
+          UserSeeder,
+        ],
+      });
+      console.log('Seeders executed successfully.');
+    } catch (error) {
+      console.error('Error running seeders:', error);
+      throw error;
+    }
+  }
 
   // Démarrage du serveur
   await app.listen(process.env.APP_PORT);
