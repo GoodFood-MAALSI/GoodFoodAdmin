@@ -35,14 +35,14 @@ export class AuthController {
     return this.authService.validateLogin(loginDto);
   }
 
-  @Post('register')
-  @ApiOperation({ summary: "Création de compte" })
-  async register(
-    @Body() createUserDto: AuthRegisterDto,
-  ): Promise<{ message: string }> {
-    const message = await this.authService.registerUser(createUserDto);
-    return { message };
-  }
+  // @Post('register')
+  // @ApiOperation({ summary: "Création de compte" })
+  // async register(
+  //   @Body() createUserDto: AuthRegisterDto,
+  // ): Promise<{ message: string }> {
+  //   const message = await this.authService.registerUser(createUserDto);
+  //   return { message };
+  // }
 
   // @Post('confirm-email')
   // @ApiOperation({ summary: "Confirmer son adresse email" })
