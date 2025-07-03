@@ -21,7 +21,6 @@ import { AuthResetPasswordDto } from './dtos/auth-reset-password.dto';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthChangePasswordDto } from './dtos/auth-change-password.dto';
 
-@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(

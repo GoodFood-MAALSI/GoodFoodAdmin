@@ -31,7 +31,6 @@ import { Pagination } from '../utils/pagination';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 
-@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
