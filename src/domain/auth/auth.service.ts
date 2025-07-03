@@ -59,6 +59,16 @@ export class AuthService {
       );
     }
 
+    if (user.status === UserStatus.Suspended) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: "Votre compte a été suspendu. Veuillez contacter le support.",
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const isValidPassword = await compareHash(loginDto.password, user.password);
 
     if (!isValidPassword) {
@@ -162,6 +172,16 @@ export class AuthService {
       );
     }
 
+    if (user.status === UserStatus.Suspended) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: "Votre compte a été suspendu. Veuillez contacter le support.",
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const hash = crypto
       .createHash("sha256")
       .update(randomStringGenerator())
@@ -202,6 +222,16 @@ export class AuthService {
     }
 
     const user = forgotReq.user;
+    if (user.status === UserStatus.Suspended) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: "Votre compte a été suspendu. Veuillez contacter le support.",
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     user.password = password;
     user.force_password_change = false;
 
@@ -258,6 +288,10 @@ export class AuthService {
 
     if (!user) {
       throw new UnauthorizedException();
+    }
+
+    if (user.status === UserStatus.Suspended) {
+      throw new UnauthorizedException('Votre compte a été suspendu. Veuillez contacter le support.');
     }
 
     const { token, refreshToken, tokenExpires } = await this.getTokensData({

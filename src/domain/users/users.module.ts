@@ -5,7 +5,6 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { Session } from '../session/entities/session.entity';
 import { MailsModule } from '../mails/mails.module';
-import { AuthValidGuard } from '../auth/guards/auth-valid.guard';
 import { SuperAdminGuard } from './guards/super-admin.guard';
 
 @Module({
@@ -14,7 +13,7 @@ import { SuperAdminGuard } from './guards/super-admin.guard';
     MailsModule
   ],
   controllers: [UsersController],
-  providers: [UsersService, AuthValidGuard, SuperAdminGuard],
+  providers: [UsersService, SuperAdminGuard],
   exports: [
     TypeOrmModule.forFeature([User]),
     UsersService,

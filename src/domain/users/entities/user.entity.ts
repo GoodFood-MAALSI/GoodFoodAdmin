@@ -17,6 +17,7 @@ import { ApiProperty } from "@nestjs/swagger";
 export enum UserStatus {
   Active = "active",
   Inactive = "inactive",
+  Suspended = "suspended",
 }
 
 export enum UserRole {
