@@ -20,6 +20,7 @@ import { AuthForgotPasswordDto } from './dtos/auth-forgot-password.dto';
 import { AuthResetPasswordDto } from './dtos/auth-reset-password.dto';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthChangePasswordDto } from './dtos/auth-change-password.dto';
+import { JwtChangePasswordGuard } from './guards/jwt-change-password.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -108,9 +109,9 @@ export class AuthController {
 
   @ApiBearerAuth()
   @Post('change-password')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtChangePasswordGuard)
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Changer le mot de passe de l\'utilisateur' })
+  @ApiOperation({ summary: "Changer le mot de passe de l'utilisateur" })
   @ApiResponse({ status: 200, description: 'Mot de passe changé avec succès' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   async changePassword(
