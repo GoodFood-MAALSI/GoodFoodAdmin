@@ -309,7 +309,7 @@ export class UsersController {
         );
       }
 
-      if (authRole !== 'administrateur') {
+      if (!['super-admin', 'admin'].includes(authRole)) {
         throw new HttpException('Rôle invalide', HttpStatus.FORBIDDEN);
       }
 
