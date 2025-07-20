@@ -5,15 +5,17 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { Session } from '../session/entities/session.entity';
 import { MailsModule } from '../mails/mails.module';
-import { SuperAdminGuard } from './guards/super-admin.guard';
+import { HttpModule } from '@nestjs/axios';
+import { InterserviceAuthGuard } from '../interservice/guards/interservice-auth.guard';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Session]),
-    MailsModule
+    MailsModule,
+    HttpModule
   ],
   controllers: [UsersController],
-  providers: [UsersService, SuperAdminGuard],
+  providers: [UsersService, InterserviceAuthGuard],
   exports: [
     TypeOrmModule.forFeature([User]),
     UsersService,

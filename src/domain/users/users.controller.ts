@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
-  ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
@@ -25,19 +24,19 @@ import { User, UserStatus } from './entities/user.entity';
 import * as jwt from 'jsonwebtoken';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateAdminUserDto } from './dto/create-admin-user.dto';
-import { SuperAdminGuard } from './guards/super-admin.guard';
 import { FilterUsersDto } from './dto/filter-users.dto';
 import { Pagination } from '../utils/pagination';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { InterserviceAuthGuardFactory } from '../interservice/guards/interservice-auth.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @UseGuards(InterserviceAuthGuardFactory(['super-admin']))
   @ApiBearerAuth()
-  @UseGuards(SuperAdminGuard)
   @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
   @ApiResponse({ status: 200, description: 'Liste des utilisateurs' })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
@@ -68,8 +67,8 @@ export class UsersController {
   }
 
   @Post()
+  @UseGuards(InterserviceAuthGuardFactory(['super-admin']))
   @ApiBearerAuth()
-  @UseGuards(SuperAdminGuard)
   @ApiOperation({
     summary:
       'Créer un nouvel utilisateur et envoyer un email avec le mot de passe',
@@ -85,8 +84,8 @@ export class UsersController {
   }
 
   @Get(':id')
+  @UseGuards(InterserviceAuthGuardFactory(['super-admin', 'admin']))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
   @ApiResponse({ status: 200, description: 'Utilisateur trouvé' })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
@@ -120,8 +119,8 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @UseGuards(InterserviceAuthGuardFactory(['super-admin', 'admin']))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: "Mettre à jour le prénom et/ou nom d'un utilisateur",
   })
@@ -167,8 +166,8 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(InterserviceAuthGuardFactory(['super-admin', 'admin']))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Supprimer définitivement un utilisateur' })
   @ApiResponse({
     status: 200,
@@ -206,8 +205,8 @@ export class UsersController {
   }
 
   @Patch(':id/suspend')
+  @UseGuards(InterserviceAuthGuardFactory(['super-admin']))
   @ApiBearerAuth()
-  @UseGuards(SuperAdminGuard)
   @ApiOperation({ summary: 'Suspendre un utilisateur' })
   @ApiResponse({ status: 200, description: 'Utilisateur suspendus avec succès' })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
@@ -243,8 +242,8 @@ export class UsersController {
   }
 
   @Patch(':id/restore')
+  @UseGuards(InterserviceAuthGuardFactory(['super-admin']))
   @ApiBearerAuth()
-  @UseGuards(SuperAdminGuard)
   @ApiOperation({ summary: 'Réactiver un utilisateur' })
   @ApiResponse({ status: 200, description: 'Utilisateur réactivés avec succès' })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
